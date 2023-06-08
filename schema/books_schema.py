@@ -15,3 +15,13 @@ class Book(BaseModel):
     state: Optional[int]
     #publication_date: datetime 
  
+class BookGoogle(BaseModel):
+    id: Optional[str]
+    title: str
+    subtitle: str
+    author: str
+    category: str
+    publisher: str
+    editor: str 
+    description: str
+   

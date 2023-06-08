@@ -22,16 +22,7 @@ async def delete_book(id: int):
     repository.delete_book(id)
     
 @router.get("/books", response_model=List[Book])
-def get_books():
+async def read_books(title: str):
     repository = Books_repository()
-    result=repository.list_book()
+    result=repository.list_book(title)
     return result
-
-'''@router.get("/books/{book_id}", response_model=Book)
-def get_book(book_id: int):
-    for book in books:
-        if book["id"] == book_id:
-            return book
-    return {"message": "Book not found"}
-
-    '''

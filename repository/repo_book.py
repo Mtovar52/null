@@ -5,6 +5,7 @@ from model.books import books
 from starlette import status
 import json
 from typing import List
+import requests
 
 class Books_repository:
 
@@ -45,10 +46,11 @@ class Books_repository:
                 print("Error Book not found", e) 
 
  
-    def list_book(self): #----------------- LIST BOOK -------------------         
+    def list_book(self, title: str): #----------------- LIST BOOK -------------------         
         try:
             with engine.connect() as conn:
-                results = conn.execute(books.select()).fetchall()
+                query = books.select().where(books.c.title.ilike(f"%{title}%"), books.c.state==1)
+                results = conn.execute(query).fetchall()
                 book_dict = []
                 for result in results:
                     book_dict.append({
@@ -62,29 +64,30 @@ class Books_repository:
                         "description": result.description,
                         "state": result.state
                     })
-                return book_dict
+                if not book_dict: 
+                    # Search in the Google Books API
+                    google_books_api_url = "https://www.googleapis.com/books/v1/volumes"
+                    params = {
+                        "q": f'intitle:{title}',
+                        "maxResults": 10
+                    }
+                    
+                    response = requests.get(google_books_api_url, params=params)
+                    if response.status_code == 200:
+                        google_books = response.json().get("items", [])
+                        for book in google_books:
+                            book_info = book["volumeInfo"]
+                            book_dict.append({
+                                "title": book_info.get("title", ""),
+                                "author": str(book_info.get("authors", [])),
+                                "description": book_info.get("description", ""),
+                                "subtitle": book_info.get("subtitle", ""),
+                                "category": str(book_info.get("categories", [])),
+                                "publisher": book_info.get("publisher", ""),
+                                "editor": book_info.get("publishedDate", ""),
+                            })
+                data = {"Search": "GOOGLE BOOKS API", "status_code": status.HTTP_200_OK, "Data":book_dict}            
+                return Response(status_code=200,content=json.dumps(data), media_type="application/json")   
         except Exception as e:
             print("Error, books not found correctly", e)
             return []   
-
-'''    def list_by_id(self): #----------------- LIST BOOK -------------------         
-        try:
-            with engine.connect() as conn:
-                results = conn.execute(books.select()).fetchall()
-                book_dict = []
-                
-                    (
-                        "id": result.id,
-                        "title": result.title,
-                        "author": result.author,
-                        "subtitle": result.subtitle,
-                        "category": result.category,
-                        "publisher": result.publisher,
-                        "editor": result.editor,
-                        "description": result.description,
-                        "state": result.state
-                    )
-                return book_dict
-        except Exception as e:
-            print("Error, books not found correctly", e)
-            return []   '''
