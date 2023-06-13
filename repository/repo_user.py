@@ -14,7 +14,7 @@ class Users_repository:
     def create_user(self, user:dict): 
         try:  
             with engine.connect() as conn:
-                new_book = users.insert().values(user)
+                new_book = users.insert().values(user) 
                 conn.execute(new_book)
                 conn.commit()
                 data = {"message": "User create successfully", "status_code": status.HTTP_201_CREATED}

@@ -12,7 +12,7 @@ class FirebaseImageRepository:
             random_name = route_sprintf % str(uuid.uuid4())
 
             # Obtener una referencia al archivo en Firebase Storage
-            blob = self.bucket.blob(random_name)
+            blob = self.bucket.blob(random_name) 
 
             # Cargar el archivo en Firebase Storage
             blob.upload_from_filename(image_path)

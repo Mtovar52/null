@@ -6,4 +6,4 @@ class Bcrypt:
         return check_password_hash(hashed_password, plain_password)
 
     def generate_password(self, password):
-        return generate_password_hash(password, "pbkdf2:sha256:30", 30)
+        return generate_password_hash(password, "pbkdf2:sha256:30", 30) 

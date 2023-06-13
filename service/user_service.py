@@ -11,7 +11,7 @@ class Service_users:
 
         new_user =  {
             "name" : user.name,
-            "email" : user.email,
+            "email" : user.email, 
             "password" : hash
         }
         response = self.user_repo.create_user(new_user)

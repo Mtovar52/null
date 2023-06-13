@@ -15,7 +15,7 @@ class GCSImageRepository:
             bucket = self.client.bucket(self.bucket_name)
 
             # Crear un objeto Blob en el bucket
-            blob = bucket.blob(random_name)
+            blob = bucket.blob(random_name) 
 
             # Establecer las opciones del objeto
             blob.cache_control = "no-cache, max-age=0"

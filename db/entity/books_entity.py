@@ -12,5 +12,5 @@ class Book(BaseModel):
     publishedDate: str
     description: str
     image: Optional[str]
-    state: Optional[int]
+    state: Optional[int] 
 

@@ -21,7 +21,7 @@ class Books_repository:
                    published_date: str, 
                    publisher: str):
         try:
-            with engine.connect() as conn:
+            with engine.connect() as conn: 
                 
                 query = books.select().where(books.c.state == 1)
                 conditions = []
