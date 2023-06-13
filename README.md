@@ -2,7 +2,9 @@
 
 
 framework: FastApi
+
 Lenguaje: Python
+
 Documentacion: https://fastapi.tiangolo.com/
 
 Reto: servicio de biblioteca, consulta de libros en db interna y externa Api de google books + open library
@@ -40,10 +42,13 @@ uvicorn main:app --reload   #### correr el servidor
 
 pip freeze > requirements.txt  ### para guardar nuevas dependencias
 
+
 # LIBRARY
 
 framework: FastApi
+
 Language: Python
+
 Documentation: https://fastapi.tiangolo.com/
 
 Challenge: library service, consultation of books in internal and external db Google Books API + open library
