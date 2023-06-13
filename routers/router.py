@@ -9,9 +9,16 @@ from typing import Optional, List
 router = APIRouter()
 
 @router.get("/books", response_model=List[Book])  #endPoint1, Consulta base interna y Api Google
-async def read_books(title: str):
+async def read_books(
+    title: str = None,
+    subtitle: str = None,
+    author: str = None,
+    category: str = None,
+    published_date: str = None,
+    publisher: str = None
+):
     service = Service_books()
-    result=service.read_books(title)
+    result=service.read_books(title, subtitle, author, category, published_date, publisher)
     return result
 
 @router.post("/books")  #endPoint2, Crear libro en db interna con info de Api Google books

@@ -6,29 +6,60 @@ from starlette import status
 import json
 from functional import seq
 import requests
-
+import ast
 
 
 class Books_repository:
 
-
  #----------------- LIST BOOK by Title,  Query in internal database and Google Api-------------------#
     
-    def read_books(self, title: str):
+    def read_books(self, 
+                   title: str,
+                   subtitle: str, 
+                   author: str,
+                   category: str, 
+                   published_date: str, 
+                   publisher: str):
         try:
             with engine.connect() as conn:
-                query = books.select().where(books.c.title.ilike(f"%{title}%"), books.c.state == 1)
+                
+                query = books.select().where(books.c.state == 1)
+                conditions = []
+                
+                if title:
+                    query = query.where(books.c.title.ilike(f"%{title}%"))
+
+                if subtitle:
+                    query = query.where(books.c.subtitle.ilike(f"%{subtitle}%"))
+
+                if author:
+                    query = query.where(books.c.author.ilike(f"%{author}%"))
+
+                if category:
+                    query = query.where(books.c.category.ilike(f"%{category}%"))
+
+                if published_date:
+                    query = query.where(books.c.publishedDate.ilike(f"%{published_date}%"))
+
+                if publisher:
+                    query = query.where(books.c.publisher.ilike(f"%{publisher}%"))
+
+                if conditions:
+                    query = query.where(*conditions)
+
                 results = conn.execute(query).fetchall()
 
                 book_dict = seq(results).map(lambda result: {
                     "source": "Db Internal",
                     "id": result.id,
                     "title": result.title,
-                    "author": result.author,
                     "subtitle": result.subtitle,
+                    "author": result.author,
                     "category": result.category,
                     "publisher": result.publisher,
+                    "publishedDate": result.publishedDate,
                     "description": result.description,
+                    "image": result.image,
                     "state": result.state
                 }).to_list()
 
@@ -57,17 +88,24 @@ class Books_repository:
             if source == "internal":
 
                 new_book = books.insert().values(book) 
-                
+
             elif source == "google":
                 data = self.read_books_APIS(selfLink)
+  
                 if data is not None:
+                    author_value = data.get("author", [])
+                    category_value = data.get("category", [])
+                    author = ', '.join(author_value) if author_value else ''
+                    category = ', '.join(category_value) if category_value else ''
                     new_book = books.insert().values(
                         title=data["title"],
                         subtitle=data["subtitle"],
-                        author=data["author"],
-                        category=data["category"] or "",
+                        author=author,
+                        category=category ,
                         publisher=data["publisher"],
+                        publishedDate=data["publishedDate"],
                         description=data["description"],
+                        image=data["imageLinks"],
                         state=1
                     )
                 else:
@@ -116,7 +154,9 @@ class Books_repository:
                     "author": volume_info.get("authors"),
                     "category": volume_info.get("categories"),
                     "publisher": volume_info.get("publisher", ""),
+                    "publishedDate": volume_info.get("publishedDate", ""), 
                     "description": volume_info.get("description", ""),
+                    "imageLinks": volume_info.get("imageLinks", {}).get("thumbnail", ""),
                 }                
 
             return google_books_dict
@@ -144,7 +184,7 @@ class Books_repository:
                 "category": str(book_info.get("categories", [])),
                 "publisher": book_info.get("publisher", ""),
                 "publishedDate": book_info.get("publishedDate", ""),
-                "thumbnailLink": book_info.get("thumbnailLink", ""),
+                "imageLinks": book_info.get("imageLinks", {}).get("thumbnail", ""),
                 "selfLink": self_link,
             }
             google_books_dict.append(book_dict)
@@ -167,12 +207,8 @@ class Books_repository:
                     "source": "Open Library",
                     "key": doc["key"],
                     "title": doc.get("title", ""),
-                    "subtitle": doc.get("subtitle", ""),
-                    "author": doc.get("author_name", []),
-                    "category": doc.get("subject", []),
-                    "publisher": doc.get("publisher", ""),
-                    "editor": doc.get("publish_places", [""])[0],
-                    "description": doc.get("description", "")
+                    "publishedDate": doc.get("publish_date", ""),    
+                    "ISBN": doc.get("isbn", []),
                 }
                 books.append(book)
             return books

@@ -11,7 +11,9 @@ books = Table(
     Column('author', String(255), nullable=False),
     Column('category', String(255), nullable=False),
     Column('publisher', String(255), nullable=False),
+    Column('publishedDate', String(255), nullable=False),
     Column('description', Text, nullable=False),
+    Column('image', Text, nullable=False),
     Column('state', Integer, nullable=False)
     #Column('publication_date', DateTime, nullable=False)
 )

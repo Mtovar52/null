@@ -9,12 +9,8 @@ class Book(BaseModel):
     author: str
     category: str
     publisher: str 
+    publishedDate: str
     description: str
+    image: Optional[str]
     state: Optional[int]
 
-    ##### no compatible con python 3.9xxx 
-    @validator('title', 'subtitle', 'author', 'category', 'publisher', 'description')
-    def validate_str_fields(cls, value):
-        if not isinstance(value, str):
-            raise ValueError('The field must be a string')
-        return value
